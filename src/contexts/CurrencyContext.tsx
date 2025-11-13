@@ -22,6 +22,7 @@ export const CURRENCIES: Currency[] = [
   { code: 'KRW', symbol: '₩', name: 'South Korean Won' },
   { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
   { code: 'NZD', symbol: 'NZ$', name: 'New Zealand Dollar' },
+  { code: 'KES', symbol: 'KSh', name: 'Kenyan Shilling' },
 ];
 
 interface CurrencyContextType {
