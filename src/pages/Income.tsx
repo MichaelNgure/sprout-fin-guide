@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface IncomeItem {
   id: string;
@@ -20,6 +21,7 @@ interface IncomeItem {
 
 const Income = () => {
   const navigate = useNavigate();
+  const { formatAmount } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [income, setIncome] = useState<IncomeItem[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -207,7 +209,7 @@ const Income = () => {
               <Card key={item.id} className="shadow-md hover:shadow-lg transition-shadow">
                 <CardContent className="flex justify-between items-center py-4">
                   <div>
-                    <p className="text-2xl font-bold text-success">${item.amount.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-success">{formatAmount(item.amount)}</p>
                     <p className="text-sm text-muted-foreground">{format(new Date(item.date), "MMM dd, yyyy")}</p>
                     {item.description && <p className="text-sm mt-1">{item.description}</p>}
                   </div>
