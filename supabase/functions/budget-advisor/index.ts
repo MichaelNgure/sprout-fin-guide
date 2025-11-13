@@ -28,6 +28,10 @@ serve(async (req) => {
       throw new Error("Unauthorized");
     }
 
+    // Get currency from request body
+    const body = await req.json();
+    const currency = body.currency || { code: 'USD', symbol: '$', name: 'US Dollar' };
+
     // Fetch user's income and expenses
     const [incomeRes, expensesRes] = await Promise.all([
       supabase.from("income").select("*").eq("user_id", user.id),
@@ -49,13 +53,13 @@ serve(async (req) => {
     // Build prompt for AI
     const prompt = `You are a financial advisor helping low-income individuals manage their budgets. Analyze this financial data and provide clear, actionable advice:
 
-Total Income: $${totalIncome.toFixed(2)}
-Total Expenses: $${totalExpenses.toFixed(2)}
-Balance: $${(totalIncome - totalExpenses).toFixed(2)}
+Total Income: ${currency.symbol}${totalIncome.toFixed(2)}
+Total Expenses: ${currency.symbol}${totalExpenses.toFixed(2)}
+Balance: ${currency.symbol}${(totalIncome - totalExpenses).toFixed(2)}
 
 Expenses by Category:
 ${Object.entries(categoryTotals)
-  .map(([cat, amt]) => `- ${cat}: $${(amt as number).toFixed(2)}`)
+  .map(([cat, amt]) => `- ${cat}: ${currency.symbol}${(amt as number).toFixed(2)}`)
   .join("\n")}
 
 Please provide:
@@ -65,7 +69,7 @@ Please provide:
 4. Tips for building savings, even with limited income
 5. A simple monthly budget plan
 
-Keep the advice simple, encouraging, and practical for someone with limited financial resources.`;
+Keep the advice simple, encouraging, and practical for someone with limited financial resources. Use ${currency.symbol} for all currency amounts in your response.`;
 
     // Call Lovable AI
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

@@ -25,7 +25,20 @@ const Advisor = () => {
   const getAdvice = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("budget-advisor");
+      // Get user's currency preference
+      const currencyData = localStorage.getItem('preferredCurrency');
+      let currency = { code: 'USD', symbol: '$', name: 'US Dollar' };
+      if (currencyData) {
+        try {
+          currency = JSON.parse(currencyData);
+        } catch (e) {
+          console.error('Failed to parse currency data');
+        }
+      }
+
+      const { data, error } = await supabase.functions.invoke("budget-advisor", {
+        body: { currency }
+      });
       
       if (error) throw error;
       
