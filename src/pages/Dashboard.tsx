@@ -9,6 +9,7 @@ import { DollarSign, TrendingUp, TrendingDown, Wallet, Calendar, ArrowUpRight, A
 import { format, subMonths, startOfMonth, endOfMonth, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface Income {
   id: string;
@@ -29,6 +30,7 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { formatAmount } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [income, setIncome] = useState<Income[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -194,7 +196,7 @@ const Dashboard = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-success">${totalIncome.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-success">{formatAmount(totalIncome)}</div>
               <p className="text-xs text-muted-foreground mt-1 flex items-center">
                 <ArrowUpRight className="h-3 w-3 mr-1" />
                 {dateRange === "all" ? "All time" : `Last ${dateRange === "1m" ? "month" : dateRange === "3m" ? "3 months" : dateRange === "6m" ? "6 months" : "year"}`}
@@ -210,7 +212,7 @@ const Dashboard = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-destructive">${totalExpenses.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-destructive">{formatAmount(totalExpenses)}</div>
               <p className="text-xs text-muted-foreground mt-1 flex items-center">
                 <ArrowDownRight className="h-3 w-3 mr-1" />
                 {dateRange === "all" ? "All time" : `Last ${dateRange === "1m" ? "month" : dateRange === "3m" ? "3 months" : dateRange === "6m" ? "6 months" : "year"}`}
@@ -227,7 +229,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className={`text-2xl font-bold ${balance >= 0 ? 'text-success' : 'text-destructive'}`}>
-                ${balance.toFixed(2)}
+                {formatAmount(balance)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">Current balance</p>
             </CardContent>
@@ -333,7 +335,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className={`text-lg font-bold ${transaction.type === 'income' ? 'text-success' : 'text-destructive'}`}>
-                      {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
+                      {transaction.type === 'income' ? '+' : '-'}{formatAmount(Number(transaction.amount))}
                     </div>
                   </div>
                 ))}

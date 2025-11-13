@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface ExpenseItem {
   id: string;
@@ -35,6 +36,7 @@ const CATEGORIES = [
 
 const Expenses = () => {
   const navigate = useNavigate();
+  const { formatAmount } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -247,7 +249,7 @@ const Expenses = () => {
                       <span className="px-2 py-1 bg-primary/10 text-primary rounded-md text-xs font-medium">
                         {item.category}
                       </span>
-                      <p className="text-2xl font-bold text-destructive">${item.amount.toFixed(2)}</p>
+                      <p className="text-2xl font-bold text-destructive">{formatAmount(item.amount)}</p>
                     </div>
                     <p className="text-sm text-muted-foreground">{format(new Date(item.date), "MMM dd, yyyy")}</p>
                     {item.notes && <p className="text-sm mt-1">{item.notes}</p>}
