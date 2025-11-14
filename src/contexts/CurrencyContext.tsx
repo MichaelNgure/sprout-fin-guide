@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { detectCurrencyFromLocale } from '@/utils/currencyDetection';
 
 interface Currency {
   code: string;
@@ -43,6 +44,15 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return CURRENCIES[0]; // Default to USD
       }
     }
+    
+    // Check if auto-detection is enabled (default: true for new users)
+    const autoDetectEnabled = localStorage.getItem('autoDetectCurrency');
+    if (autoDetectEnabled === null || autoDetectEnabled === 'true') {
+      const detectedCurrency = detectCurrencyFromLocale();
+      localStorage.setItem('preferredCurrency', JSON.stringify(detectedCurrency));
+      return detectedCurrency;
+    }
+    
     return CURRENCIES[0];
   });
 
