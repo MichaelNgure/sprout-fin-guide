@@ -2,7 +2,7 @@ import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Home, DollarSign, CreditCard, Sparkles, LogOut, Wallet, Settings as SettingsIcon } from "lucide-react";
+import { Home, DollarSign, CreditCard, Sparkles, LogOut, Wallet, Settings as SettingsIcon, Target } from "lucide-react";
 import { toast } from "sonner";
 
 const Navigation = () => {
@@ -61,6 +61,14 @@ const Navigation = () => {
               >
                 <Sparkles className="w-4 h-4" />
                 <span>AI Advisor</span>
+              </NavLink>
+              <NavLink
+                to="/budget-goals"
+                className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors flex items-center space-x-2"
+                activeClassName="bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
+              >
+                <Target className="w-4 h-4" />
+                <span>Goals</span>
               </NavLink>
               <NavLink
                 to="/settings"
