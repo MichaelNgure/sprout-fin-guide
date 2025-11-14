@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useCurrency, CURRENCIES } from "@/contexts/CurrencyContext";
 import { toast } from "sonner";
-import { DollarSign, Check } from "lucide-react";
+import { DollarSign, Check, MapPin } from "lucide-react";
 
 const Settings = () => {
   const { currency, setCurrency } = useCurrency();
   const [selectedCurrency, setSelectedCurrency] = useState(currency.code);
+  const [autoDetect, setAutoDetect] = useState(() => {
+    const saved = localStorage.getItem('autoDetectCurrency');
+    return saved === null || saved === 'true';
+  });
 
   const handleCurrencyChange = (currencyCode: string) => {
     const newCurrency = CURRENCIES.find(c => c.code === currencyCode);
@@ -19,6 +24,12 @@ const Settings = () => {
       setSelectedCurrency(currencyCode);
       toast.success(`Currency updated to ${newCurrency.name}`);
     }
+  };
+
+  const handleAutoDetectToggle = (enabled: boolean) => {
+    setAutoDetect(enabled);
+    localStorage.setItem('autoDetectCurrency', String(enabled));
+    toast.success(`Auto-detect currency ${enabled ? 'enabled' : 'disabled'}`);
   };
 
   return (
@@ -43,6 +54,22 @@ const Settings = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50 border border-border">
+              <div className="flex items-center gap-3">
+                <MapPin className="h-5 w-5 text-primary" />
+                <div>
+                  <Label htmlFor="auto-detect" className="text-base font-medium">Auto-detect Currency</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Automatically set currency based on your location
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="auto-detect"
+                checked={autoDetect}
+                onCheckedChange={handleAutoDetectToggle}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="currency">Currency</Label>
               <Select value={selectedCurrency} onValueChange={handleCurrencyChange}>
