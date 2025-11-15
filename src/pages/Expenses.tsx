@@ -9,9 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Camera, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ExpenseItem {
   id: string;
@@ -22,15 +23,14 @@ interface ExpenseItem {
 }
 
 const CATEGORIES = [
-  "Housing",
-  "Food",
+  "Food & Dining",
   "Transportation",
+  "Housing",
   "Utilities",
   "Healthcare",
-  "Education",
   "Entertainment",
-  "Clothing",
-  "Personal Care",
+  "Shopping",
+  "Education",
   "Other"
 ];
 
@@ -47,6 +47,8 @@ const Expenses = () => {
     date: format(new Date(), "yyyy-MM-dd"),
     notes: "",
   });
+  const [scanningReceipt, setScanningReceipt] = useState(false);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -126,6 +128,7 @@ const Expenses = () => {
     });
     setEditingId(item.id);
     setShowForm(true);
+    setReceiptPreview(null);
   };
 
   const handleDelete = async (id: string) => {
@@ -136,6 +139,75 @@ const Expenses = () => {
       await fetchExpenses();
     } catch (error: any) {
       toast.error("Failed to delete expense");
+    }
+  };
+
+  const handleReceiptUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be less than 5MB");
+      return;
+    }
+
+    setScanningReceipt(true);
+    
+    try {
+      // Convert image to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Image = reader.result as string;
+        setReceiptPreview(base64Image);
+
+        try {
+          const { data, error } = await supabase.functions.invoke('scan-receipt', {
+            body: { imageData: base64Image }
+          });
+
+          if (error) {
+            console.error('Receipt scan error:', error);
+            toast.error(error.message || "Failed to scan receipt");
+            setScanningReceipt(false);
+            return;
+          }
+
+          if (data) {
+            // Auto-fill form with extracted data
+            setFormData({
+              ...formData,
+              amount: data.amount?.toString() || "",
+              category: data.category || "",
+              notes: data.notes || ""
+            });
+            
+            const confidenceMsg = data.confidence === 'high' 
+              ? '✓ High confidence' 
+              : data.confidence === 'medium' 
+              ? '~ Medium confidence - please verify' 
+              : '⚠ Low confidence - please check values';
+            
+            toast.success(`Receipt scanned! ${confidenceMsg}`);
+          }
+          setScanningReceipt(false);
+        } catch (err: any) {
+          console.error('Scan error:', err);
+          toast.error("Failed to process receipt");
+          setScanningReceipt(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error: any) {
+      console.error('File read error:', error);
+      toast.error("Failed to read image file");
+      setScanningReceipt(false);
     }
   };
 
@@ -167,9 +239,52 @@ const Expenses = () => {
           <Card className="mb-8 shadow-lg">
             <CardHeader>
               <CardTitle>{editingId ? "Edit Expense" : "Add New Expense"}</CardTitle>
+              <CardDescription>
+                Manually enter details or scan a receipt to auto-fill
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
+                {!editingId && (
+                  <div className="space-y-2">
+                    <Label htmlFor="receipt-upload" className="flex items-center gap-2">
+                      <Camera className="h-4 w-4" />
+                      Scan Receipt (Optional)
+                    </Label>
+                    <div className="flex gap-2 items-start">
+                      <div className="flex-1">
+                        <Input
+                          id="receipt-upload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleReceiptUpload}
+                          disabled={scanningReceipt}
+                          className="cursor-pointer"
+                        />
+                      </div>
+                      {scanningReceipt && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Scanning...
+                        </div>
+                      )}
+                    </div>
+                    {receiptPreview && (
+                      <div className="mt-2">
+                        <img 
+                          src={receiptPreview} 
+                          alt="Receipt preview" 
+                          className="max-h-40 rounded border border-border"
+                        />
+                      </div>
+                    )}
+                    <Alert>
+                      <AlertDescription className="text-xs">
+                        💡 Upload a clear photo of your receipt for automatic data extraction
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="category">Category</Label>
