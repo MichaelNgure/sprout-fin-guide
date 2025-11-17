@@ -47,6 +47,7 @@ const Expenses = () => {
     date: format(new Date(), "yyyy-MM-dd"),
     notes: "",
   });
+  const [customCategory, setCustomCategory] = useState("");
   const [scanningReceipt, setScanningReceipt] = useState(false);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
 
@@ -83,12 +84,20 @@ const Expenses = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    // Validate custom category if "Other" is selected
+    if (formData.category === "Other" && !customCategory.trim()) {
+      toast.error("Please specify the expense category");
+      return;
+    }
+
+    const finalCategory = formData.category === "Other" ? customCategory.trim() : formData.category;
+
     try {
       if (editingId) {
         const { error } = await supabase
           .from("expenses")
           .update({
-            category: formData.category,
+            category: finalCategory,
             amount: parseFloat(formData.amount),
             date: formData.date,
             notes: formData.notes || null,
@@ -100,7 +109,7 @@ const Expenses = () => {
       } else {
         const { error } = await supabase.from("expenses").insert({
           user_id: user.id,
-          category: formData.category,
+          category: finalCategory,
           amount: parseFloat(formData.amount),
           date: formData.date,
           notes: formData.notes || null,
@@ -111,6 +120,7 @@ const Expenses = () => {
       }
       
       setFormData({ category: "", amount: "", date: format(new Date(), "yyyy-MM-dd"), notes: "" });
+      setCustomCategory("");
       setShowForm(false);
       setEditingId(null);
       await fetchExpenses();
@@ -120,12 +130,15 @@ const Expenses = () => {
   };
 
   const handleEdit = (item: ExpenseItem) => {
+    // Check if category is a custom one (not in predefined list)
+    const isCustomCategory = !CATEGORIES.includes(item.category);
     setFormData({
-      category: item.category,
+      category: isCustomCategory ? "Other" : item.category,
       amount: item.amount.toString(),
       date: item.date,
       notes: item.notes || "",
     });
+    setCustomCategory(isCustomCategory ? item.category : "");
     setEditingId(item.id);
     setShowForm(true);
     setReceiptPreview(null);
@@ -180,13 +193,22 @@ const Expenses = () => {
           }
 
           if (data) {
+            // Check if category is custom (not in predefined list)
+            const scannedCategory = data.category || "";
+            const isCustom = scannedCategory && !CATEGORIES.includes(scannedCategory);
+            
             // Auto-fill form with extracted data
             setFormData({
               ...formData,
               amount: data.amount?.toString() || "",
-              category: data.category || "",
+              category: isCustom ? "Other" : scannedCategory,
               notes: data.notes || ""
             });
+            
+            // Set custom category if needed
+            if (isCustom) {
+              setCustomCategory(scannedCategory);
+            }
             
             const confidenceMsg = data.confidence === 'high' 
               ? '✓ High confidence' 
@@ -229,7 +251,12 @@ const Expenses = () => {
             <h1 className="text-3xl font-bold text-foreground mb-2">Expenses</h1>
             <p className="text-muted-foreground">Track your spending</p>
           </div>
-          <Button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ category: "", amount: "", date: format(new Date(), "yyyy-MM-dd"), notes: "" }); }}>
+          <Button onClick={() => { 
+            setShowForm(!showForm); 
+            setEditingId(null); 
+            setCustomCategory("");
+            setFormData({ category: "", amount: "", date: format(new Date(), "yyyy-MM-dd"), notes: "" }); 
+          }}>
             <Plus className="w-4 h-4 mr-2" />
             Add Expense
           </Button>
@@ -290,19 +317,38 @@ const Expenses = () => {
                     <Label htmlFor="category">Category</Label>
                     <Select
                       value={formData.category}
-                      onValueChange={(value) => setFormData({ ...formData, category: value })}
+                      onValueChange={(value) => {
+                        setFormData({ ...formData, category: value });
+                        if (value !== "Other") {
+                          setCustomCategory("");
+                        }
+                      }}
                       required
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-popover z-50">
                         {CATEGORIES.map((cat) => (
                           <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
+                  {formData.category === "Other" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="customCategory">Specify Category</Label>
+                      <Input
+                        id="customCategory"
+                        type="text"
+                        value={customCategory}
+                        onChange={(e) => setCustomCategory(e.target.value)}
+                        placeholder="E.g., Pet Supplies, Insurance, etc."
+                        maxLength={50}
+                        required
+                      />
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <Label htmlFor="amount">Amount</Label>
                     <Input
@@ -339,7 +385,11 @@ const Expenses = () => {
                   <Button type="submit">
                     {editingId ? "Update" : "Add"} Expense
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => { setShowForm(false); setEditingId(null); }}>
+                  <Button type="button" variant="outline" onClick={() => { 
+                    setShowForm(false); 
+                    setEditingId(null); 
+                    setCustomCategory("");
+                  }}>
                     Cancel
                   </Button>
                 </div>
