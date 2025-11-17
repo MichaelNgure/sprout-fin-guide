@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { useCurrency, CURRENCIES } from "@/contexts/CurrencyContext";
 import { toast } from "sonner";
 import { DollarSign, Check, MapPin } from "lucide-react";
+import { detectCurrencyFromLocale } from "@/utils/currencyDetection";
 
 const Settings = () => {
   const { currency, setCurrency } = useCurrency();
@@ -29,7 +30,16 @@ const Settings = () => {
   const handleAutoDetectToggle = (enabled: boolean) => {
     setAutoDetect(enabled);
     localStorage.setItem('autoDetectCurrency', String(enabled));
-    toast.success(`Auto-detect currency ${enabled ? 'enabled' : 'disabled'}`);
+    
+    if (enabled) {
+      // Immediately detect and apply currency when enabled
+      const detectedCurrency = detectCurrencyFromLocale();
+      setCurrency(detectedCurrency);
+      setSelectedCurrency(detectedCurrency.code);
+      toast.success(`Currency auto-detected: ${detectedCurrency.name}`);
+    } else {
+      toast.success('Auto-detect currency disabled');
+    }
   };
 
   return (
