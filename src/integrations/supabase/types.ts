@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      advice_history: {
+        Row: {
+          advice: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          advice: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          advice?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       budget_goals: {
         Row: {
           category: string
