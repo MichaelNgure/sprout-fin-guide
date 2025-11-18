@@ -132,13 +132,16 @@ const Income = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
       <Navigation />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Income</h1>
-            <p className="text-muted-foreground">Track your income sources</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Income</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Track your income sources</p>
           </div>
-          <Button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ amount: "", date: format(new Date(), "yyyy-MM-dd"), description: "" }); }}>
+          <Button 
+            onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ amount: "", date: format(new Date(), "yyyy-MM-dd"), description: "" }); }}
+            className="w-full sm:w-auto"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add Income
           </Button>
@@ -184,11 +187,11 @@ const Income = () => {
                     placeholder="E.g., Salary, Freelance work, etc."
                   />
                 </div>
-                <div className="flex space-x-2">
-                  <Button type="submit">
+                <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2 sm:gap-0">
+                  <Button type="submit" className="w-full sm:w-auto">
                     {editingId ? "Update" : "Add"} Income
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => { setShowForm(false); setEditingId(null); }}>
+                  <Button type="button" variant="outline" onClick={() => { setShowForm(false); setEditingId(null); }} className="w-full sm:w-auto">
                     Cancel
                   </Button>
                 </div>
@@ -207,17 +210,17 @@ const Income = () => {
           ) : (
             income.map((item) => (
               <Card key={item.id} className="shadow-md hover:shadow-lg transition-shadow">
-                <CardContent className="flex justify-between items-center py-4">
-                  <div>
-                    <p className="text-2xl font-bold text-success">{formatAmount(item.amount)}</p>
-                    <p className="text-sm text-muted-foreground">{format(new Date(item.date), "MMM dd, yyyy")}</p>
+                <CardContent className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-3 sm:gap-0">
+                  <div className="flex-1">
+                    <p className="text-xl sm:text-2xl font-bold text-success">{formatAmount(item.amount)}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{format(new Date(item.date), "MMM dd, yyyy")}</p>
                     {item.description && <p className="text-sm mt-1">{item.description}</p>}
                   </div>
                   <div className="flex space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(item)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(item)} className="flex-1 sm:flex-none">
                       <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)} className="text-destructive hover:text-destructive flex-1 sm:flex-none">
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>

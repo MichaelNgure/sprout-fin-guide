@@ -245,18 +245,21 @@ const Expenses = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
       <Navigation />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Expenses</h1>
-            <p className="text-muted-foreground">Track your spending</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Expenses</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Track your spending</p>
           </div>
-          <Button onClick={() => { 
-            setShowForm(!showForm); 
-            setEditingId(null); 
-            setCustomCategory("");
-            setFormData({ category: "", amount: "", date: format(new Date(), "yyyy-MM-dd"), notes: "" }); 
-          }}>
+          <Button 
+            onClick={() => { 
+              setShowForm(!showForm); 
+              setEditingId(null); 
+              setCustomCategory("");
+              setFormData({ category: "", amount: "", date: format(new Date(), "yyyy-MM-dd"), notes: "" }); 
+            }}
+            className="w-full sm:w-auto"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add Expense
           </Button>
@@ -381,15 +384,15 @@ const Expenses = () => {
                     placeholder="Add any additional details..."
                   />
                 </div>
-                <div className="flex space-x-2">
-                  <Button type="submit">
+                <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2 sm:gap-0">
+                  <Button type="submit" className="w-full sm:w-auto">
                     {editingId ? "Update" : "Add"} Expense
                   </Button>
                   <Button type="button" variant="outline" onClick={() => { 
                     setShowForm(false); 
                     setEditingId(null); 
                     setCustomCategory("");
-                  }}>
+                  }} className="w-full sm:w-auto">
                     Cancel
                   </Button>
                 </div>
@@ -408,22 +411,22 @@ const Expenses = () => {
           ) : (
             expenses.map((item) => (
               <Card key={item.id} className="shadow-md hover:shadow-lg transition-shadow">
-                <CardContent className="flex justify-between items-center py-4">
-                  <div>
-                    <div className="flex items-center space-x-3 mb-1">
-                      <span className="px-2 py-1 bg-primary/10 text-primary rounded-md text-xs font-medium">
+                <CardContent className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-3 sm:gap-0">
+                  <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 gap-2 mb-1">
+                      <span className="px-2 py-1 bg-primary/10 text-primary rounded-md text-xs font-medium inline-block w-fit">
                         {item.category}
                       </span>
-                      <p className="text-2xl font-bold text-destructive">{formatAmount(item.amount)}</p>
+                      <p className="text-xl sm:text-2xl font-bold text-destructive">{formatAmount(item.amount)}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">{format(new Date(item.date), "MMM dd, yyyy")}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{format(new Date(item.date), "MMM dd, yyyy")}</p>
                     {item.notes && <p className="text-sm mt-1">{item.notes}</p>}
                   </div>
                   <div className="flex space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(item)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(item)} className="flex-1 sm:flex-none">
                       <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)} className="text-destructive hover:text-destructive flex-1 sm:flex-none">
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
