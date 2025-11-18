@@ -164,16 +164,16 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
       <Navigation />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
-            <p className="text-muted-foreground">Overview of your financial health</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Dashboard</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Overview of your financial health</p>
           </div>
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent>
@@ -187,7 +187,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card className="shadow-md hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Total Income</CardTitle>
@@ -251,15 +251,15 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle>Income vs Expenses</CardTitle>
-              <CardDescription>Track your cash flow over time</CardDescription>
+              <CardTitle className="text-lg sm:text-xl">Income vs Expenses</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Track your cash flow over time</CardDescription>
             </CardHeader>
             <CardContent>
               {timeSeriesData.length > 0 ? (
-                <ChartContainer config={chartConfig} className="h-[300px]">
+                <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px]">
                   <LineChart data={timeSeriesData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="month" className="text-xs" />
@@ -271,7 +271,7 @@ const Dashboard = () => {
                   </LineChart>
                 </ChartContainer>
               ) : (
-                <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                <div className="flex items-center justify-center h-[250px] sm:h-[300px] text-sm sm:text-base text-muted-foreground">
                   No data available for this period
                 </div>
               )}
@@ -280,12 +280,12 @@ const Dashboard = () => {
 
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle>Spending by Category</CardTitle>
-              <CardDescription>Top expense categories</CardDescription>
+              <CardTitle className="text-lg sm:text-xl">Spending by Category</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Top expense categories</CardDescription>
             </CardHeader>
             <CardContent>
               {categoryData.length > 0 ? (
-                <ChartContainer config={chartConfig} className="h-[300px]">
+                <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px]">
                   <BarChart data={categoryData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="category" className="text-xs" />
@@ -295,7 +295,7 @@ const Dashboard = () => {
                   </BarChart>
                 </ChartContainer>
               ) : (
-                <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                <div className="flex items-center justify-center h-[250px] sm:h-[300px] text-sm sm:text-base text-muted-foreground">
                   No expense data available
                 </div>
               )}
@@ -305,43 +305,43 @@ const Dashboard = () => {
 
         <Card className="shadow-md">
           <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
-            <CardDescription>Your latest income and expenses</CardDescription>
+            <CardTitle className="text-lg sm:text-xl">Recent Transactions</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Your latest income and expenses</CardDescription>
           </CardHeader>
           <CardContent>
             {recentTransactions.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {recentTransactions.map((transaction) => (
-                  <div key={transaction.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className={`h-10 w-10 rounded-full ${transaction.type === 'income' ? 'bg-success/10' : 'bg-destructive/10'} flex items-center justify-center`}>
+                  <div key={transaction.id} className="flex items-start sm:items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors gap-2">
+                    <div className="flex items-start sm:items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <div className={`h-8 w-8 sm:h-10 sm:w-10 rounded-full ${transaction.type === 'income' ? 'bg-success/10' : 'bg-destructive/10'} flex items-center justify-center flex-shrink-0`}>
                         {transaction.type === 'income' ? (
-                          <ArrowUpRight className="h-5 w-5 text-success" />
+                          <ArrowUpRight className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
                         ) : (
-                          <ArrowDownRight className="h-5 w-5 text-destructive" />
+                          <ArrowDownRight className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
                         )}
                       </div>
-                      <div>
-                        <p className="font-medium text-foreground">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-foreground text-sm sm:text-base truncate">
                           {transaction.type === 'income' 
                             ? ('description' in transaction && transaction.description) || 'Income'
                             : ('category' in transaction && transaction.category) || 'Expense'
                           }
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-xs sm:text-sm text-muted-foreground truncate">
                           {format(parseISO(transaction.date), "MMM dd, yyyy")}
                           {'notes' in transaction && transaction.notes && ` • ${transaction.notes}`}
                         </p>
                       </div>
                     </div>
-                    <div className={`text-lg font-bold ${transaction.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                    <div className={`text-sm sm:text-lg font-bold whitespace-nowrap flex-shrink-0 ${transaction.type === 'income' ? 'text-success' : 'text-destructive'}`}>
                       {transaction.type === 'income' ? '+' : '-'}{formatAmount(Number(transaction.amount))}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center text-muted-foreground py-8">
+              <div className="text-center text-sm sm:text-base text-muted-foreground py-8">
                 No transactions yet
               </div>
             )}

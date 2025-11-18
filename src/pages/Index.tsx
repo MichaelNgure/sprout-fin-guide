@@ -20,21 +20,21 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-16">
-          <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <Wallet className="w-10 h-10 text-primary-foreground" />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Wallet className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground" />
           </div>
-          <h1 className="text-5xl font-bold text-foreground mb-4">Budget Buddy</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 px-4">Budget Buddy</h1>
+          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Your personal AI-powered budgeting companion. Track expenses, manage income, 
             and receive intelligent financial guidance tailored for you.
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate("/auth")} className="shadow-lg">
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center px-4">
+            <Button size="lg" onClick={() => navigate("/auth")} className="shadow-lg w-full sm:w-auto">
               Get Started Free
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
+            <Button size="lg" variant="outline" onClick={() => navigate("/auth")} className="w-full sm:w-auto">
               Sign In
             </Button>
           </div>
@@ -79,13 +79,13 @@ const Index = () => {
         </div>
 
         <Card className="shadow-xl bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
-          <CardContent className="py-12 text-center">
-            <h2 className="text-3xl font-bold mb-4">Start Managing Your Finances Today</h2>
-            <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+          <CardContent className="py-8 sm:py-12 text-center px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">Start Managing Your Finances Today</h2>
+            <p className="text-base sm:text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
               Join thousands of users who are taking control of their financial future with Budget Buddy.
               It's completely free to start!
             </p>
-            <Button size="lg" onClick={() => navigate("/auth")} className="shadow-lg">
+            <Button size="lg" onClick={() => navigate("/auth")} className="shadow-lg w-full sm:w-auto">
               Create Your Free Account
             </Button>
           </CardContent>
