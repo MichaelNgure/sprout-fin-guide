@@ -5,15 +5,33 @@ import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Sparkles, Loader2, Save, Info } from "lucide-react";
+import { Sparkles, Loader2, Save, Info, MessageSquare } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { ChatInterface } from "@/components/ChatInterface";
 
 const Advisor = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [advice, setAdvice] = useState<string>("");
   const [saving, setSaving] = useState(false);
+  
+  // Get user's currency preference
+  const getCurrency = () => {
+    const currencyData = localStorage.getItem('preferredCurrency');
+    let currency = { code: 'USD', symbol: '$', name: 'US Dollar' };
+    if (currencyData) {
+      try {
+        currency = JSON.parse(currencyData);
+      } catch (e) {
+        console.error('Failed to parse currency data');
+      }
+    }
+    return currency;
+  };
+  
+  const currency = getCurrency();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -28,17 +46,6 @@ const Advisor = () => {
   const getAdvice = async () => {
     setLoading(true);
     try {
-      // Get user's currency preference
-      const currencyData = localStorage.getItem('preferredCurrency');
-      let currency = { code: 'USD', symbol: '$', name: 'US Dollar' };
-      if (currencyData) {
-        try {
-          currency = JSON.parse(currencyData);
-        } catch (e) {
-          console.error('Failed to parse currency data');
-        }
-      }
-
       const { data, error } = await supabase.functions.invoke("budget-advisor", {
         body: { currency }
       });
@@ -97,44 +104,72 @@ const Advisor = () => {
           <Info className="h-4 w-4 text-primary" />
           <AlertDescription className="text-sm sm:text-base ml-2">
             <strong>How to use:</strong> First, add your income and expenses in their respective pages. 
-            Then come back here and click "Get Budget Advice" to receive AI-powered financial recommendations 
-            based on your spending patterns.
+            Then come back here for AI-powered financial recommendations based on your spending patterns.
           </AlertDescription>
         </Alert>
 
-        <Card className="shadow-lg mb-6 sm:mb-8">
-          <CardHeader className="pb-4 sm:pb-6">
-            <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
-              <span>Your Personal Financial Assistant</span>
-            </CardTitle>
-            <CardDescription className="text-sm leading-relaxed mt-2">
-              Get AI-powered budgeting advice based on your income and expenses.
-              Identify spending patterns, savings strategies, and actionable financial tips.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <Button 
-              onClick={getAdvice} 
-              disabled={loading}
-              size="lg"
-              className="w-full sm:w-auto min-h-[44px] text-base"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  <span className="hidden sm:inline">Analyzing Your Finances...</span>
-                  <span className="sm:hidden">Analyzing...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Get Budget Advice
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="chat" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="chat" className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              Chat Advisor
+            </TabsTrigger>
+            <TabsTrigger value="quick" className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Quick Advice
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="chat">
+            <Card className="shadow-lg">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center space-x-2">
+                  <MessageSquare className="w-5 h-5 text-primary" />
+                  <span>Chat with Your Financial Advisor</span>
+                </CardTitle>
+                <CardDescription>
+                  Have a conversation about your finances, ask questions, and get personalized advice in real-time.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <ChatInterface currency={currency} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="quick">
+            <Card className="shadow-lg mb-6 sm:mb-8">
+              <CardHeader className="pb-4 sm:pb-6">
+                <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
+                  <span>Quick Financial Analysis</span>
+                </CardTitle>
+                <CardDescription className="text-sm leading-relaxed mt-2">
+                  Get a comprehensive analysis of your income, expenses, and receive actionable financial tips.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Button 
+                  onClick={getAdvice} 
+                  disabled={loading}
+                  size="lg"
+                  className="w-full sm:w-auto min-h-[44px] text-base"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <span className="hidden sm:inline">Analyzing Your Finances...</span>
+                      <span className="sm:hidden">Analyzing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Get Budget Advice
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
 
         {advice && (
           <Card className="shadow-lg">
@@ -184,17 +219,19 @@ const Advisor = () => {
           </Card>
         )}
 
-        {!advice && (
-          <Card className="shadow-md bg-muted/50">
-            <CardContent className="py-8 sm:py-12 text-center">
-              <Sparkles className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-muted-foreground" />
-              <h3 className="text-base sm:text-lg font-semibold mb-2">No advice yet</h3>
-              <p className="text-sm sm:text-base text-muted-foreground px-4">
-                Click "Get Budget Advice" to receive personalized recommendations
-              </p>
-            </CardContent>
-          </Card>
-        )}
+            {!advice && (
+              <Card className="shadow-md bg-muted/50">
+                <CardContent className="py-8 sm:py-12 text-center">
+                  <Sparkles className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-muted-foreground" />
+                  <h3 className="text-base sm:text-lg font-semibold mb-2">No advice yet</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground px-4">
+                    Click "Get Budget Advice" to receive personalized recommendations
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

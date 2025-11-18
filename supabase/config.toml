@@ -3,5 +3,8 @@ project_id = "vbcgyrrzwrujkvnvyxkk"
 [functions.budget-advisor]
 verify_jwt = true
 
+[functions.chat-advisor]
+verify_jwt = true
+
 [functions.scan-receipt]
 verify_jwt = true
