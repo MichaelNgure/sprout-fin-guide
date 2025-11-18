@@ -2,7 +2,7 @@ import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Home, DollarSign, CreditCard, Sparkles, LogOut, Wallet, Settings as SettingsIcon, Target, Menu, X } from "lucide-react";
+import { Home, DollarSign, CreditCard, Sparkles, LogOut, Wallet, Settings as SettingsIcon, Target, Menu, X, History } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -26,6 +26,7 @@ const Navigation = () => {
     { to: "/income", icon: DollarSign, label: "Income" },
     { to: "/expenses", icon: CreditCard, label: "Expenses" },
     { to: "/advisor", icon: Sparkles, label: "AI Advisor" },
+    { to: "/saved-advice", icon: History, label: "Saved Advice" },
     { to: "/budget-goals", icon: Target, label: "Goals" },
     { to: "/settings", icon: SettingsIcon, label: "Settings" },
   ];
