@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Income from "./pages/Income";
 import Expenses from "./pages/Expenses";
 import Advisor from "./pages/Advisor";
+import SavedAdvice from "./pages/SavedAdvice";
 import Settings from "./pages/Settings";
 import BudgetGoals from "./pages/BudgetGoals";
 import NotFound from "./pages/NotFound";
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/income" element={<Income />} />
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/advisor" element={<Advisor />} />
+            <Route path="/saved-advice" element={<SavedAdvice />} />
             <Route path="/budget-goals" element={<BudgetGoals />} />
             <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
