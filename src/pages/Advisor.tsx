@@ -4,14 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, Save, Info } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 const Advisor = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [advice, setAdvice] = useState<string>("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -56,6 +58,32 @@ const Advisor = () => {
     }
   };
 
+  const saveAdvice = async () => {
+    if (!advice) return;
+    
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { error } = await supabase
+        .from("advice_history")
+        .insert({
+          user_id: user.id,
+          advice: advice,
+        });
+
+      if (error) throw error;
+
+      toast.success("Advice saved successfully!");
+    } catch (error: any) {
+      console.error("Save error:", error);
+      toast.error(error.message || "Failed to save advice");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
       <Navigation />
@@ -64,6 +92,15 @@ const Advisor = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">AI Budget Advisor</h1>
           <p className="text-sm sm:text-base text-muted-foreground">Get personalized financial guidance</p>
         </div>
+
+        <Alert className="mb-6 sm:mb-8 bg-primary/5 border-primary/20">
+          <Info className="h-4 w-4 text-primary" />
+          <AlertDescription className="text-sm sm:text-base ml-2">
+            <strong>How to use:</strong> First, add your income and expenses in their respective pages. 
+            Then come back here and click "Get Budget Advice" to receive AI-powered financial recommendations 
+            based on your spending patterns.
+          </AlertDescription>
+        </Alert>
 
         <Card className="shadow-lg mb-6 sm:mb-8">
           <CardHeader className="pb-4 sm:pb-6">
@@ -102,7 +139,28 @@ const Advisor = () => {
         {advice && (
           <Card className="shadow-lg">
             <CardHeader className="pb-4 sm:pb-6">
-              <CardTitle className="text-primary text-lg sm:text-xl">Your Personalized Advice</CardTitle>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <CardTitle className="text-primary text-lg sm:text-xl">Your Personalized Advice</CardTitle>
+                <Button 
+                  onClick={saveAdvice} 
+                  disabled={saving}
+                  variant="outline"
+                  size="sm"
+                  className="w-full sm:w-auto"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Advice
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert">
