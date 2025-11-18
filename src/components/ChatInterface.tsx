@@ -3,10 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Send, Bot, User } from "lucide-react";
+import { Loader2, Send, Bot, User, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Message {
   role: "user" | "assistant";
@@ -21,8 +32,14 @@ export const ChatInterface = ({ currency }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-advisor`;
+
+  // Load chat history on mount
+  useEffect(() => {
+    loadChatHistory();
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -30,10 +47,78 @@ export const ChatInterface = ({ currency }: ChatInterfaceProps) => {
     }
   }, [messages]);
 
+  const loadChatHistory = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("chat_messages")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+
+      if (data) {
+        setMessages(data.map(msg => ({
+          role: msg.role as "user" | "assistant",
+          content: msg.content
+        })));
+      }
+    } catch (error: any) {
+      console.error("Failed to load chat history:", error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const saveMessage = async (role: "user" | "assistant", content: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("chat_messages")
+        .insert({
+          user_id: user.id,
+          role,
+          content
+        });
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Failed to save message:", error);
+    }
+  };
+
+  const clearHistory = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("chat_messages")
+        .delete()
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      setMessages([]);
+      toast.success("Chat history cleared");
+    } catch (error: any) {
+      console.error("Failed to clear history:", error);
+      toast.error("Failed to clear chat history");
+    }
+  };
+
   const streamChat = async (userMessage: string) => {
     const newMessages = [...messages, { role: "user" as const, content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
+
+    // Save user message to database
+    await saveMessage("user", userMessage);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -130,6 +215,11 @@ export const ChatInterface = ({ currency }: ChatInterfaceProps) => {
         }
       }
 
+      // Save assistant's final message to database
+      if (assistantMessage) {
+        await saveMessage("assistant", assistantMessage);
+      }
+
     } catch (error: any) {
       console.error("Chat error:", error);
       toast.error(error.message || "Failed to send message");
@@ -150,15 +240,48 @@ export const ChatInterface = ({ currency }: ChatInterfaceProps) => {
 
   return (
     <div className="flex flex-col h-[600px]">
+      <div className="border-b p-3 bg-muted/30 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <Bot className="w-5 h-5 text-primary" />
+          <span className="text-sm font-medium">Financial Advisor Chat</span>
+        </div>
+        {messages.length > 0 && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Clear History
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Clear chat history?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete all your chat messages. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={clearHistory}>Clear</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+      </div>
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
-          {messages.length === 0 && (
+          {isLoadingHistory ? (
+            <div className="text-center text-muted-foreground py-12">
+              <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin" />
+              <p className="text-sm">Loading chat history...</p>
+            </div>
+          ) : messages.length === 0 ? (
             <div className="text-center text-muted-foreground py-12">
               <Bot className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p className="text-lg font-medium mb-2">Start a conversation</p>
               <p className="text-sm">Ask me anything about your finances, budgeting, or savings!</p>
             </div>
-          )}
+          ) : null}
           
           {messages.map((message, index) => (
             <div
