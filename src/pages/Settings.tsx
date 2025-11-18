@@ -28,12 +28,14 @@ const Settings = () => {
   };
 
   const handleAutoDetectToggle = (enabled: boolean) => {
+    console.log('Auto-detect toggle clicked:', enabled);
     setAutoDetect(enabled);
     localStorage.setItem('autoDetectCurrency', String(enabled));
     
     if (enabled) {
       // Immediately detect and apply currency when enabled
       const detectedCurrency = detectCurrencyFromLocale();
+      console.log('Detected currency:', detectedCurrency);
       setCurrency(detectedCurrency);
       setSelectedCurrency(detectedCurrency.code);
       toast.success(`Currency auto-detected: ${detectedCurrency.name}`);
@@ -82,7 +84,11 @@ const Settings = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="currency">Currency</Label>
-              <Select value={selectedCurrency} onValueChange={handleCurrencyChange}>
+              <Select 
+                value={selectedCurrency} 
+                onValueChange={handleCurrencyChange}
+                disabled={autoDetect}
+              >
                 <SelectTrigger id="currency" className="w-full bg-background">
                   <SelectValue placeholder="Select currency" />
                 </SelectTrigger>
