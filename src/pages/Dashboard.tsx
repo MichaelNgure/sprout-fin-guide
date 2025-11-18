@@ -257,22 +257,22 @@ const Dashboard = () => {
               <CardTitle className="text-base sm:text-xl">Income vs Expenses</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Track your cash flow over time</CardDescription>
             </CardHeader>
-            <CardContent className="px-2 sm:px-6">
+            <CardContent className="px-2 sm:px-6 overflow-hidden">
               {timeSeriesData.length > 0 ? (
-                <ChartContainer config={chartConfig} className="h-[200px] sm:h-[280px] md:h-[320px]">
-                  <LineChart data={timeSeriesData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                <ChartContainer config={chartConfig} className="h-[240px] sm:h-[320px] md:h-[360px]">
+                  <LineChart data={timeSeriesData} margin={{ top: 5, right: 10, left: -15, bottom: 50 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
                     <XAxis 
                       dataKey="month" 
-                      tick={{ fontSize: 10 }}
+                      tick={{ fontSize: 9 }}
                       interval="preserveStartEnd"
-                      angle={-45}
+                      angle={-35}
                       textAnchor="end"
-                      height={60}
+                      height={45}
                     />
                     <YAxis 
                       tick={{ fontSize: 10 }}
-                      width={40}
+                      width={35}
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <ChartLegend 
@@ -298,7 +298,7 @@ const Dashboard = () => {
                   </LineChart>
                 </ChartContainer>
               ) : (
-                <div className="flex items-center justify-center h-[200px] sm:h-[280px] md:h-[320px] text-xs sm:text-sm text-muted-foreground">
+                <div className="flex items-center justify-center h-[240px] sm:h-[320px] md:h-[360px] text-xs sm:text-sm text-muted-foreground">
                   No data available for this period
                 </div>
               )}
@@ -310,22 +310,22 @@ const Dashboard = () => {
               <CardTitle className="text-base sm:text-xl">Spending by Category</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Top expense categories</CardDescription>
             </CardHeader>
-            <CardContent className="px-2 sm:px-6">
+            <CardContent className="px-2 sm:px-6 overflow-hidden">
               {categoryData.length > 0 ? (
-                <ChartContainer config={chartConfig} className="h-[200px] sm:h-[280px] md:h-[320px]">
-                  <BarChart data={categoryData.slice(0, 6)} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                <ChartContainer config={chartConfig} className="h-[240px] sm:h-[320px] md:h-[360px]">
+                  <BarChart data={categoryData.slice(0, 6)} margin={{ top: 5, right: 10, left: -15, bottom: 50 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
                     <XAxis 
                       dataKey="category" 
-                      tick={{ fontSize: 10 }}
-                      angle={-45}
+                      tick={{ fontSize: 9 }}
+                      angle={-35}
                       textAnchor="end"
-                      height={60}
+                      height={45}
                       interval={0}
                     />
                     <YAxis 
                       tick={{ fontSize: 10 }}
-                      width={40}
+                      width={35}
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Bar 
@@ -337,7 +337,7 @@ const Dashboard = () => {
                   </BarChart>
                 </ChartContainer>
               ) : (
-                <div className="flex items-center justify-center h-[200px] sm:h-[280px] md:h-[320px] text-xs sm:text-sm text-muted-foreground">
+                <div className="flex items-center justify-center h-[240px] sm:h-[320px] md:h-[360px] text-xs sm:text-sm text-muted-foreground">
                   No expense data available
                 </div>
               )}
