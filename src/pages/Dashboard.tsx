@@ -253,25 +253,52 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
           <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg sm:text-xl">Income vs Expenses</CardTitle>
+            <CardHeader className="pb-2 sm:pb-6">
+              <CardTitle className="text-base sm:text-xl">Income vs Expenses</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Track your cash flow over time</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-2 sm:px-6">
               {timeSeriesData.length > 0 ? (
-                <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px]">
-                  <LineChart data={timeSeriesData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="month" className="text-xs" />
-                    <YAxis className="text-xs" />
+                <ChartContainer config={chartConfig} className="h-[200px] sm:h-[280px] md:h-[320px]">
+                  <LineChart data={timeSeriesData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                    <XAxis 
+                      dataKey="month" 
+                      tick={{ fontSize: 10 }}
+                      interval="preserveStartEnd"
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 10 }}
+                      width={40}
+                    />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    <Line type="monotone" dataKey="income" stroke="var(--color-income)" strokeWidth={2} dot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="expenses" stroke="var(--color-expenses)" strokeWidth={2} dot={{ r: 4 }} />
+                    <ChartLegend 
+                      content={<ChartLegendContent />}
+                      wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="income" 
+                      stroke="var(--color-income)" 
+                      strokeWidth={2} 
+                      dot={{ r: 3 }} 
+                      activeDot={{ r: 5 }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="expenses" 
+                      stroke="var(--color-expenses)" 
+                      strokeWidth={2} 
+                      dot={{ r: 3 }}
+                      activeDot={{ r: 5 }}
+                    />
                   </LineChart>
                 </ChartContainer>
               ) : (
-                <div className="flex items-center justify-center h-[250px] sm:h-[300px] text-sm sm:text-base text-muted-foreground">
+                <div className="flex items-center justify-center h-[200px] sm:h-[280px] md:h-[320px] text-xs sm:text-sm text-muted-foreground">
                   No data available for this period
                 </div>
               )}
@@ -279,23 +306,38 @@ const Dashboard = () => {
           </Card>
 
           <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg sm:text-xl">Spending by Category</CardTitle>
+            <CardHeader className="pb-2 sm:pb-6">
+              <CardTitle className="text-base sm:text-xl">Spending by Category</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Top expense categories</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-2 sm:px-6">
               {categoryData.length > 0 ? (
-                <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px]">
-                  <BarChart data={categoryData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="category" className="text-xs" />
-                    <YAxis className="text-xs" />
+                <ChartContainer config={chartConfig} className="h-[200px] sm:h-[280px] md:h-[320px]">
+                  <BarChart data={categoryData.slice(0, 6)} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                    <XAxis 
+                      dataKey="category" 
+                      tick={{ fontSize: 10 }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                      interval={0}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 10 }}
+                      width={40}
+                    />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="amount" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+                    <Bar 
+                      dataKey="amount" 
+                      fill="hsl(var(--primary))" 
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={60}
+                    />
                   </BarChart>
                 </ChartContainer>
               ) : (
-                <div className="flex items-center justify-center h-[250px] sm:h-[300px] text-sm sm:text-base text-muted-foreground">
+                <div className="flex items-center justify-center h-[200px] sm:h-[280px] md:h-[320px] text-xs sm:text-sm text-muted-foreground">
                   No expense data available
                 </div>
               )}
