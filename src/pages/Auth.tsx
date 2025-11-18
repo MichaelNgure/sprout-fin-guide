@@ -19,7 +19,7 @@ const Auth = () => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
       }
     };
     checkUser();
@@ -37,7 +37,7 @@ const Auth = () => {
         });
         if (error) throw error;
         toast.success("Welcome back!");
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -48,7 +48,7 @@ const Auth = () => {
         });
         if (error) throw error;
         toast.success("Account created! Logging you in...");
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
       }
     } catch (error: any) {
       toast.error(error.message || "Authentication failed");
