@@ -2,6 +2,9 @@
 
 A comprehensive personal finance management application that helps you track your income, manage expenses, set budget goals, and receive AI-powered financial advice.
 
+## View Live Demo
+[Here is the Live Demo](https://sprout-fin-guide.vercel.app/)
+
 ## Features
 
 ### 📊 Dashboard
