@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Sparkles, Loader2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 const Advisor = () => {
   const navigate = useNavigate();
@@ -104,10 +105,22 @@ const Advisor = () => {
               <CardTitle className="text-primary text-lg sm:text-xl">Your Personalized Advice</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-sm max-w-none">
-                <div className="whitespace-pre-wrap text-foreground leading-relaxed text-sm sm:text-base">
+              <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert">
+                <ReactMarkdown
+                  components={{
+                    h1: ({ children }) => <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-4 mt-6 first:mt-0">{children}</h1>,
+                    h2: ({ children }) => <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-3 mt-5">{children}</h2>,
+                    h3: ({ children }) => <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 mt-4">{children}</h3>,
+                    p: ({ children }) => <p className="text-foreground/90 mb-3 leading-relaxed">{children}</p>,
+                    ul: ({ children }) => <ul className="list-disc list-inside space-y-2 mb-4 text-foreground/90">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 mb-4 text-foreground/90">{children}</ol>,
+                    li: ({ children }) => <li className="ml-2">{children}</li>,
+                    strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                    em: ({ children }) => <em className="italic text-foreground/80">{children}</em>,
+                  }}
+                >
                   {advice}
-                </div>
+                </ReactMarkdown>
               </div>
             </CardContent>
           </Card>
