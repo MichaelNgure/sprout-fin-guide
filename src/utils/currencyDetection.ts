@@ -31,7 +31,37 @@ const COUNTRY_TO_CURRENCY: Record<string, string> = {
 
 export const detectCurrencyFromLocale = () => {
   try {
-    // Try to get country from browser locale
+    // PRIORITY 1: Try timezone-based detection (most reliable for actual location)
+    try {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      console.log('Timezone:', timeZone);
+      
+      // Map common African timezones
+      const timezoneToCountry: Record<string, string> = {
+        'Africa/Nairobi': 'KE',
+        'Africa/Lagos': 'NG',
+        'Africa/Johannesburg': 'ZA',
+        'Africa/Cairo': 'EG',
+        'Africa/Casablanca': 'MA',
+      };
+      
+      for (const [tz, countryCode] of Object.entries(timezoneToCountry)) {
+        if (timeZone?.includes(tz)) {
+          const currencyCode = COUNTRY_TO_CURRENCY[countryCode];
+          if (currencyCode) {
+            const currency = CURRENCIES.find(c => c.code === currencyCode);
+            console.log('Currency from timezone:', currency);
+            if (currency) {
+              return currency;
+            }
+          }
+        }
+      }
+    } catch (timezoneError) {
+      console.error('Timezone detection failed:', timezoneError);
+    }
+    
+    // PRIORITY 2: Try to get country from browser locale
     const locale = navigator.language || 'en-US';
     console.log('Browser locale:', locale);
     
@@ -47,7 +77,7 @@ export const detectCurrencyFromLocale = () => {
       }
     }
     
-    // Fallback: try to get currency from Intl
+    // PRIORITY 3: Try to get currency from Intl
     try {
       const formatter = new Intl.NumberFormat(locale, {
         style: 'currency',
@@ -62,19 +92,6 @@ export const detectCurrencyFromLocale = () => {
       }
     } catch (intlError) {
       console.error('Intl detection failed:', intlError);
-    }
-    
-    // Additional fallback: try timezone-based detection
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    console.log('Timezone:', timeZone);
-    
-    // Map timezone to likely currency (basic mapping for Kenya)
-    if (timeZone?.includes('Nairobi') || timeZone?.includes('Africa/Nairobi')) {
-      const kesCurrency = CURRENCIES.find(c => c.code === 'KES');
-      console.log('Currency from timezone:', kesCurrency);
-      if (kesCurrency) {
-        return kesCurrency;
-      }
     }
     
   } catch (error) {
