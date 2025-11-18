@@ -170,13 +170,27 @@ const SavedAdvice = () => {
           </Button>
         </div>
 
-        {compareMode && selectedForCompare.length > 0 && (
+        {compareMode && (
           <Alert className="mb-6 bg-primary/5 border-primary/20">
             <AlertCircle className="h-4 w-4 text-primary" />
             <AlertDescription className="ml-2">
-              {selectedForCompare.length === 1
-                ? "Select one more advice to compare"
-                : "Comparing 2 advice items - scroll to see both side by side"}
+              {selectedForCompare.length === 0 ? (
+                <span className="font-medium">Click on any advice card below to select it for comparison (select 2 items)</span>
+              ) : selectedForCompare.length === 1 ? (
+                <span className="font-medium">Selected 1 item - click on another advice card to compare</span>
+              ) : (
+                <span className="font-medium">Comparing 2 items - viewing side by side</span>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {selectedDate && !compareMode && (
+          <Alert className="mb-6 bg-secondary/5 border-secondary/20">
+            <CalendarIcon className="h-4 w-4 text-secondary" />
+            <AlertDescription className="ml-2">
+              Showing advice from <span className="font-medium">{format(selectedDate, "PPP")}</span>
+              {filteredAdvice.length === 0 && " - No advice found for this date"}
             </AlertDescription>
           </Alert>
         )}
@@ -214,16 +228,21 @@ const SavedAdvice = () => {
                   key={advice.id}
                   className={cn(
                     "shadow-lg transition-all",
-                    compareMode && "cursor-pointer hover:border-primary",
-                    selectedForCompare.includes(advice.id) && "border-primary border-2"
+                    compareMode && "cursor-pointer hover:border-primary hover:shadow-xl",
+                    selectedForCompare.includes(advice.id) && "border-primary border-2 bg-primary/5"
                   )}
                   onClick={() => compareMode && toggleCompareSelection(advice.id)}
                 >
                   <CardHeader className="pb-3 sm:pb-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <div>
-                        <CardTitle className="text-base sm:text-lg">
+                      <div className="flex-1">
+                        <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                           Advice from {format(new Date(advice.created_at), "PPP")}
+                          {compareMode && selectedForCompare.includes(advice.id) && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary text-primary-foreground">
+                              Selected
+                            </span>
+                          )}
                         </CardTitle>
                         <CardDescription className="text-xs sm:text-sm mt-1">
                           {format(new Date(advice.created_at), "p")}
@@ -233,7 +252,10 @@ const SavedAdvice = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => deleteAdvice(advice.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteAdvice(advice.id);
+                          }}
                           className="text-destructive hover:text-destructive hover:bg-destructive/10 w-full sm:w-auto"
                         >
                           <Trash2 className="w-4 h-4 mr-1" />
